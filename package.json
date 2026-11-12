@@ -1,0 +1,38 @@
+{
+  "name": "@cutoutlabs/mcp",
+  "version": "0.2.2",
+  "description": "MCP server for Cutout Labs: remove image backgrounds from local files or URLs and save transparent PNGs.",
+  "mcpName": "com.cutoutlabs/mcp",
+  "type": "module",
+  "bin": {
+    "cutoutlabs-mcp": "index.js"
+  },
+  "files": [
+    "index.js",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "background-removal",
+    "remove-background",
+    "removebg",
+    "transparent-png"
+  ],
+  "homepage": "https://www.cutoutlabs.com/background-removal-api",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cutout-labs/mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cutout-labs/mcp/issues"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "zod": "^4.0.0"
+  }
+}

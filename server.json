@@ -1,0 +1,46 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.cutoutlabs/mcp",
+  "title": "Cutout Labs",
+  "description": "Remove image backgrounds from local files or URLs and get transparent PNG cutouts.",
+  "websiteUrl": "https://www.cutoutlabs.com/background-removal-api",
+  "repository": {
+    "url": "https://github.com/cutout-labs/mcp",
+    "source": "github"
+  },
+  "version": "0.2.2",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@cutoutlabs/mcp",
+      "version": "0.2.2",
+      "runtimeHint": "npx",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "CUTOUTLABS_API_KEY",
+          "description": "Free Cutout Labs API key from https://www.cutoutlabs.com/background-removal-api",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://api.cutoutlabs.com/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Bearer followed by your free Cutout Labs API key",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}

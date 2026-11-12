@@ -1,0 +1,96 @@
+name: Publish
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  npm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write # npm trusted publishing and provenance
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      # Trusted publishing needs npm 11.5.1 or later.
+      - run: npm install -g npm@^11.5.1
+
+      - name: Check versions match
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          for field in version 'packages[0].version'; do
+            test "$(node -p "require('./server.json').${field}")" = "$version" || {
+              echo "server.json ${field} does not match package version ${version}"
+              exit 1
+            }
+          done
+          if [ "${GITHUB_REF_TYPE}" = tag ] && [ "${GITHUB_REF_NAME}" != "v${version}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package version ${version}"
+            exit 1
+          fi
+
+      - run: node --check index.js
+
+      - name: Publish to npm unless this version exists
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if npm view "@cutoutlabs/mcp@${version}" version >/dev/null 2>&1; then
+            echo "@cutoutlabs/mcp@${version} is already on npm"
+          else
+            npm publish --access public --provenance
+          fi
+
+  registry:
+    needs: npm
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      MCP_PUBLISHER_VERSION: v1.8.1
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+
+      - name: Download and verify mcp-publisher
+        run: |
+          set -euo pipefail
+          archive="mcp-publisher_linux_amd64.tar.gz"
+          base_url="https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}"
+          curl --fail --location --silent --show-error --output "$archive" "$base_url/$archive"
+          curl --fail --location --silent --show-error --output "$archive.sigstore.json" "$base_url/$archive.sigstore.json"
+          cosign verify-blob \
+            --bundle "$archive.sigstore.json" \
+            --certificate-identity "https://github.com/modelcontextprotocol/registry/.github/workflows/release.yml@refs/tags/${MCP_PUBLISHER_VERSION}" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            "$archive"
+          tar xzf "$archive" mcp-publisher
+          rm -f "$archive" "$archive.sigstore.json"
+
+      # Domain (DNS) auth publishes as com.cutoutlabs/* without tying the listing to a GitHub account.
+      - run: ./mcp-publisher login dns --domain cutoutlabs.com --private-key "${MCP_PRIVATE_KEY}"
+        env:
+          MCP_PRIVATE_KEY: ${{ secrets.MCP_PRIVATE_KEY }}
+
+      # The registry rejects versions npm hasn't made visible yet.
+      - name: Wait for npm to serve this version
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          for attempt in $(seq 1 30); do
+            curl -sf "https://registry.npmjs.org/@cutoutlabs%2fmcp/${version}" >/dev/null && exit 0
+            sleep 10
+          done
+          echo "@cutoutlabs/mcp@${version} did not appear on npm"
+          exit 1
+
+      - run: ./mcp-publisher publish
