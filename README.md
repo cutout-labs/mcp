@@ -24,11 +24,11 @@ No local install? Use the hosted server instead: `https://api.cutoutlabs.com/mcp
 ## Tools
 
 - `remove_background`: `input_path` or `image_url`, plus optional `output_path`, `size` (`preview`, `medium`, `hd`, `full`), `format` (`png`, `webp`, `jpg`), `bg_color`, `crop`, `roi` (keep only the subject inside `x1 y1 x2 y2`), `clean_edges` (remove coloured fringes), `overwrite`. Saves the result and returns its path.
-- `get_quota`: free calls left today. The quota resets at 00:00 UTC.
+- `get_quota`: free calls left this month. The quota resets on the 1st of each month at 00:00 UTC.
 
 ## Limits
 
-Inputs up to 12 MB. Free daily quota per key during launch.
+Inputs up to 12 MB. 150 free images per calendar month per key during launch, and 10 requests per minute.
 
 ## License
 

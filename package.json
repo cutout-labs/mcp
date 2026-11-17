@@ -1,6 +1,6 @@
 {
   "name": "@cutoutlabs/mcp",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "MCP server for Cutout Labs: remove image backgrounds from local files or URLs and save transparent PNGs.",
   "mcpName": "com.cutoutlabs/mcp",
   "type": "module",
@@ -13,6 +13,9 @@
   ],
   "engines": {
     "node": ">=20"
+  },
+  "scripts": {
+    "test": "node scripts/smoke-test.mjs"
   },
   "keywords": [
     "mcp",

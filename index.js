@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { access, readFile, stat, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -38,10 +39,12 @@ async function exists(file) {
   );
 }
 
+const { version } = createRequire(import.meta.url)("./package.json");
+
 const server = new McpServer({
   name: "cutoutlabs",
   title: "Cutout Labs",
-  version: "0.2.1",
+  version,
 });
 
 server.registerTool(
@@ -168,7 +171,7 @@ server.registerTool(
     const height = response.headers.get("x-height");
     const remaining = response.headers.get("x-quota-remaining");
     return text(
-      `Saved ${target}${width && height ? ` (${width}×${height})` : ""}. ${remaining ?? "?"} free calls left today.`,
+      `Saved ${target}${width && height ? ` (${width}×${height})` : ""}. ${remaining ?? "?"} free calls left this month.`,
     );
   },
 );
@@ -177,7 +180,8 @@ server.registerTool(
   "get_quota",
   {
     title: "Check remaining free calls",
-    description: "Return how many free remove_background calls remain today.",
+    description:
+      "Return how many free remove_background calls remain this month for the API key. The quota resets on the 1st of each month at 00:00 UTC.",
     annotations: { readOnlyHint: true },
   },
   async () => {
@@ -189,7 +193,7 @@ server.registerTool(
     if (!response.ok) return failure(await errorMessage(response));
     const body = await response.json();
     return text(
-      `${body.data.attributes.api.free_calls} free calls left today. Resets at 00:00 UTC.`,
+      `${body.data.attributes.api.free_calls} free calls left this month. Resets on the 1st at 00:00 UTC.`,
     );
   },
 );
