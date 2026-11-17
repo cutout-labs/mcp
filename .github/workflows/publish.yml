@@ -35,6 +35,10 @@ jobs:
               exit 1
             }
           done
+          test "$(node -p "require('./plugin.json').version")" = "$version" || {
+            echo "plugin.json version does not match package version ${version}"
+            exit 1
+          }
           if [ "${GITHUB_REF_TYPE}" = tag ] && [ "${GITHUB_REF_NAME}" != "v${version}" ]; then
             echo "Tag ${GITHUB_REF_NAME} does not match package version ${version}"
             exit 1

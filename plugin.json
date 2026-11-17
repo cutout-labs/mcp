@@ -1,0 +1,21 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "cutoutlabs",
+  "version": "0.2.3",
+  "description": "Remove image backgrounds from local files or URLs and save transparent PNG, WebP or JPG cutouts with Cutout Labs.",
+  "author": {
+    "name": "Cutout Labs",
+    "email": "support@cutoutlabs.com",
+    "url": "https://www.cutoutlabs.com"
+  },
+  "homepage": "https://www.cutoutlabs.com/background-removal-api",
+  "repository": "https://github.com/cutout-labs/mcp",
+  "license": "MIT",
+  "keywords": [
+    "background-removal",
+    "remove-background",
+    "transparent-png",
+    "image-editing",
+    "mcp"
+  ]
+}
